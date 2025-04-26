@@ -34,13 +34,7 @@ from xgboost import XGBClassifier
 #     load_config,
 # )
 # Change to run directly with poetry
-from src.utils.config import (
-    create_directories,
-    get_data_paths,
-    get_model_config,
-    get_paths,
-    load_config,
-)
+from src.utils.config import create_directories, get_data_paths, get_model_config, get_paths, load_config
 
 # Import MLflow utilities
 #from utils.mlflow_utils import setup_mlflow, log_model_metrics, log_best_model
