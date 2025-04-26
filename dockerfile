@@ -8,6 +8,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       build-essential \
       curl \
+      libgomp1 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -24,6 +25,11 @@ RUN pip install poetry \
 # 2) Runtime stage: copy just what’s needed
 #########################################
 FROM python:3.10-slim AS runtime
+
+# install only the OpenMP runtime so lightgbm can find libgomp.so.1
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libgomp1 \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
