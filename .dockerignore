@@ -1,0 +1,12 @@
+# .dockerignore
+__pycache__
+.git
+.gitignore
+models
+figures
+results
+mlruns
+logs
+*.pyc
+*.pyo
+*.pyd
