@@ -73,3 +73,26 @@ def test_identify_and_transform_skewed_features(monkeypatch):
     assert all(result['flat'] == 1)
     # 'skewed' last value should be log1p(100)
     assert np.isclose(result['skewed'].iloc[-1], np.log1p(100))
+
+def test_implement_clustering(monkeypatch):
+    config = {"feature_engineering": {"clustering": {"n_clusters": 2, "random_state": 0}}}
+    monkeypatch.setattr(preprocess, 'get_preprocessing_config', lambda: config)
+    df = pd.DataFrame({
+        'income': [1,1,100,100],
+        'kidhome': [0,0,0,0],
+        'teenhome': [0,0,0,0],
+        'recency': [1,1,100,100],
+        'mntwines': [0,0,0,0],
+        'mntfruits': [0,0,0,0],
+        'mntmeatproducts': [0,0,0,0],
+        'mntfishproducts': [0,0,0,0],
+        'mntsweetproducts': [0,0,0,0],
+        'mntgoldprods': [0,0,0,0],
+        'numwebpurchases': [0,0,0,0],
+        'numcatalogpurchases': [0,0,0,0],
+        'numstorepurchases': [0,0,0,0],
+        'numwebvisitsmonth': [0,0,0,0]
+    })
+    result = preprocess.implement_clustering(df.copy())
+    assert 'customer_segment' in result.columns
+    assert set(result['customer_segment']) == {0, 1}
