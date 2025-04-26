@@ -118,3 +118,29 @@ def test_load_data(tmp_path, monkeypatch):
     assert isinstance(X_train, pd.DataFrame)
     assert isinstance(y_train, pd.Series)
     assert y_train.tolist() == [0, 1, 0]
+
+def test_get_model_variants(monkeypatch):
+    # Mock get_model_config to return a simple param dict
+    monkeypatch.setattr(mp, 'get_model_config', lambda name, tuned: {'n_estimators': 5})
+
+    # xgboost
+    model_xgb = mp.get_model('xgboost')
+    assert isinstance(model_xgb, XGBClassifier)
+
+    # lightgbm
+    model_lgb = mp.get_model('lightgbm')
+    assert isinstance(model_lgb, LGBMClassifier)
+
+    # randomforest
+    model_rf = mp.get_model('randomforest')
+    assert isinstance(model_rf, RandomForestClassifier)
+
+    # catboost returns tuple (model, cat_features)
+    result = mp.get_model('catboost')
+    assert isinstance(result, tuple)
+    model_cb, cat_features = result
+    assert isinstance(model_cb, CatBoostClassifier)
+
+    # unsupported model raises ValueError
+    with pytest.raises(ValueError):
+        mp.get_model('unknown_model')
