@@ -28,3 +28,25 @@ def test_clean_column_names():
     df = pd.DataFrame({' Column One ': [1], 'SecondCol': [2]})
     cleaned = preprocess.clean_column_names(df.copy())
     assert list(cleaned.columns) == ['column_one', 'secondcol']
+
+def test_handle_missing_values_drop_and_impute(monkeypatch):
+    config = {"missing_values": {"drop_threshold": 0.5, "imputation_method": "median"}}
+    monkeypatch.setattr(preprocess, 'get_preprocessing_config', lambda: config)
+    df = pd.DataFrame({'A': [1, None, 3], 'B': [None, None, 1], 'C': [10, 20, 30]})
+    result = preprocess.handle_missing_values(df.copy())
+    assert 'B' not in result.columns
+    assert result['A'].iloc[1] == 2.0
+
+def test_apply_recategorization(monkeypatch):
+    config = {
+        "feature_engineering": {
+            "recategorization": {
+                "col": {"a": "A", "b": "B"}
+            }
+        }
+    }
+    monkeypatch.setattr(preprocess, 'get_preprocessing_config', lambda: config)
+    df = pd.DataFrame({'col': ['a', 'b', 'c']})
+    result = preprocess.apply_recategorization(df.copy())
+    # a→A, b→B, c stays 'c'
+    assert result['col'].tolist() == ['A', 'B', 'c']
