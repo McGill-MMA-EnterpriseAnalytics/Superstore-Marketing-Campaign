@@ -190,3 +190,23 @@ def test_evaluate_model_on_test():
     # Check that all expected keys are present
     for key in ['test_accuracy', 'test_precision', 'test_recall', 'test_f1', 'test_roc_auc']:
         assert key in metrics
+
+def test_save_results(tmp_path):
+    # Monkeypatch get_paths() to return tmp 'results' directory
+    import importlib
+    importlib.reload(mp)
+    mp.get_paths = lambda: {'results': str(tmp_path)}
+
+    val_metrics = {'accuracy': 0.8}
+    test_metrics = {'test_accuracy': 0.75}
+
+    # First save
+    file1 = mp.save_results('mod', val_metrics, test_metrics, tuned=False)
+    assert os.path.exists(file1)
+    df1 = pd.read_csv(file1)
+    assert 'val_accuracy' in df1.columns and 'test_accuracy' in df1.columns
+
+    # Append second time
+    file2 = mp.save_results('mod', val_metrics, test_metrics, tuned=False)
+    df2 = pd.read_csv(file2)
+    assert len(df2) == 2
