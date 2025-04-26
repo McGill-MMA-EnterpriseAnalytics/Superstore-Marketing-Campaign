@@ -50,3 +50,26 @@ def test_apply_recategorization(monkeypatch):
     result = preprocess.apply_recategorization(df.copy())
     # a→A, b→B, c stays 'c'
     assert result['col'].tolist() == ['A', 'B', 'c']
+
+def test_load_data(tmp_path, monkeypatch):
+    df = pd.DataFrame({'x': [1, 2, 3]})
+    file = tmp_path / 'data.csv'
+    df.to_csv(file, index=False)
+    monkeypatch.setattr(preprocess, 'get_data_paths', lambda: {"raw": str(file)})
+    loaded = preprocess.load_data()
+    # Should load exactly what we wrote
+    pd.testing.assert_frame_equal(loaded.reset_index(drop=True), df)
+
+def test_identify_and_transform_skewed_features(monkeypatch):
+    # need >2 unique values so the column is considered
+    config = {"feature_engineering": {"skewness_threshold": 0.5}}
+    monkeypatch.setattr(preprocess, 'get_preprocessing_config', lambda: config)
+    df = pd.DataFrame({
+        'flat': [1, 1, 1, 1, 1, 1],
+        'skewed': [0, 0, 0, 0, 50, 100]
+    })
+    result = preprocess.identify_and_transform_skewed_features(df.copy())
+    # 'flat' unchanged
+    assert all(result['flat'] == 1)
+    # 'skewed' last value should be log1p(100)
+    assert np.isclose(result['skewed'].iloc[-1], np.log1p(100))
