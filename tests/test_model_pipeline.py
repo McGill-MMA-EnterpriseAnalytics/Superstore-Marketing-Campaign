@@ -158,3 +158,24 @@ def test_save_and_load_model(tmp_path, monkeypatch):
     # Loading should return the same DummyModel
     loaded = joblib.load(filepath)
     assert isinstance(loaded, DummyModel)
+
+
+def test_plot_feature_importance_and_confusion(tmp_path, monkeypatch):
+    # Monkeypatch get_paths() to return tmp 'figures' directory
+    monkeypatch.setattr(mp, 'get_paths', lambda: {'figures': str(tmp_path)})
+
+    # Feature importance: use a dummy model with feature_importances_
+    class FIModel:
+        feature_importances_ = np.array([0.1, 0.2, 0.3])
+
+    model = FIModel()
+    feature_names = ['f1', 'f2', 'f3']
+    path1 = mp.plot_feature_importance(model, feature_names, 'mod')
+    assert os.path.exists(path1)
+
+    # Confusion matrix: use a real DecisionTreeClassifier on simple data
+    X = pd.DataFrame({'x': [0, 1, 0, 1]})
+    y = np.array([0, 1, 0, 1])
+    dt = DecisionTreeClassifier().fit(X, y)
+    path2 = mp.plot_confusion_matrix(dt, X, y, 'dtmod')
+    assert os.path.exists(path2)
