@@ -45,7 +45,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 # Only these top-level keys remain here:
-line-length = 120
+line-length = 130
 exclude = [
   ".git",
   "__pycache__",
