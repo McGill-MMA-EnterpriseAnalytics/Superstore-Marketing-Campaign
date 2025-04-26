@@ -1,0 +1,17 @@
+# ruff.toml
+
+[lint]
+select = ["F", "E", "W", "I", "C"]
+exclude = [
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  "models",
+  "figures",
+  "**/*.ipynb",
+  "src/utils/config.py",
+]
+
+[lint.pycodestyle]
+max-line-length = 130

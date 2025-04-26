@@ -1,0 +1,151 @@
+
+# Data paths
+data:
+  raw: 'superstore_data.csv'
+  dictionary: 'datadictionary.xlsx'
+  processed:
+    train: 'train.parquet'
+    validation: 'val.parquet'
+    test: 'test.parquet'
+
+# Preprocessing configurations
+preprocessing:
+  missing_values:
+    drop_threshold: 0.70
+    imputation_method: 'median'
+  feature_engineering:
+    clustering:
+      n_clusters: 6
+      random_state: 42
+    scaling_method: 'standard'
+    skewness_threshold: 1.0
+    recategorization:
+      education:
+        PhD: 'Post Graduate'
+        Master: 'Post Graduate'
+        2n Cycle: 'Graduate'
+        Graduation: 'Graduate'
+        Basic: 'Pre Graduate'
+      marital_status:
+        Married: 'Married'
+        Together: 'Together'
+        Single: 'Single'
+        Divorced: 'Divorced'
+        Widow: 'Widow'
+        Alone: 'Single'
+        YOLO: 'Single'
+        Absurd: 'Single'
+
+# Model configurations
+models:
+  catboost:
+    baseline:
+      iterations: 100
+      learning_rate: 0.1
+      depth: 6
+      l2_leaf_reg: 3
+      random_seed: 42
+      verbose: 0
+    tuned:
+      iterations: 200
+      learning_rate: 0.05
+      depth: 8
+      l2_leaf_reg: 1
+      random_seed: 42
+      verbose: 0
+
+  lightgbm:
+    baseline:
+      n_estimators: 100
+      max_depth: 7
+      learning_rate: 0.1
+      num_leaves: 31
+      random_state: 42
+      verbosity: -1
+    tuned:
+      n_estimators: 150
+      max_depth: 8
+      learning_rate: 0.05
+      num_leaves: 40
+      min_child_samples: 20
+      subsample: 0.8
+      colsample_bytree: 0.8
+      random_state: 42
+      verbosity: -1
+
+  randomforest:
+    baseline:
+      n_estimators: 100
+      max_depth: 10
+      min_samples_split: 2
+      random_state: 42
+    tuned:
+      n_estimators: 200
+      max_depth: 15
+      min_samples_split: 5
+      min_samples_leaf: 2
+      max_features: 'sqrt'
+      random_state: 42
+
+  xgboost:
+    baseline:
+      n_estimators: 100
+      max_depth: 5
+      learning_rate: 0.1
+      min_child_weight: 3
+      random_state: 42
+      verbosity: 0
+    tuned:
+      n_estimators: 200
+      max_depth: 6
+      learning_rate: 0.05
+      min_child_weight: 2
+      subsample: 0.8
+      colsample_bytree: 0.8
+      gamma: 0.1
+      random_state: 42
+      verbosity: 0
+
+  stacking:
+    baseline:
+      base_models: ['xgboost', 'lightgbm', 'catboost']
+      meta_model: 'logistic_regression'
+      cv: 5
+      random_state: 42
+    tuned:
+      base_models: ['xgboost', 'lightgbm', 'catboost', 'randomforest']
+      meta_model: 'logistic_regression'
+      cv: 5
+      passthrough: True         # renamed from use_features_in_secondary
+      random_state: 42
+
+# Training configuration (moved out of `models:`)
+training:
+  cv_folds: 5
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+  class_weight: 'balanced'
+  random_state: 42
+
+# Paths for saving artifacts (also out of `models:`)
+paths:
+  models: 'models/'
+  figures: 'figures/'
+  results: 'results/'
+  logs: 'logs/'
+
+# config.yaml
+
+monitoring:
+  reference_data_path: 'val.parquet'
+  production_data_glob: '*.parquet'
+  model_path: 'models/xgboost_automl_tuned.pkl'  
+  thresholds:
+    feature_drift:     0.1
+    target_drift:      0.05
+    prediction_drift:  0.05
+    performance_drop:  0.05

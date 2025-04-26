@@ -1,0 +1,22 @@
+﻿Column Name,Data Type,Description
+ID,int64,Unique ID of each customer
+Year_Birth,int64,Age of the customer
+Complain,int64, 1 if the customer complained in the last 2 years
+Dt_Customer,object,Date of customer's enrollment with the company
+Education ,object,Customer's level of education
+Marital_Status,object,Customer's marital status
+Kidhome,int64,Number of small children in customer's household
+Teenhome,int64,Number of teenagers in customer's household
+Income,float64,Customer's yearly household income
+MntFishProducts,int64,The amount spent on fish products in the last 2 years
+MntMeatProducts,int64,The amount spent on meat products in the last 2 years
+MntFruits,int64,The amount spent on fruits products in the last 2 years
+MntSweetProducts,int64,Amount spent on sweet products in the last 2 years
+MntWines,int64,The amount spent on wine products in the last 2 years
+MntGoldProds,int64,The amount spent on gold products in the last 2 years
+NumDealsPurchases,int64,Number of purchases made with discount
+NumCatalogPurchases,int64,Number of purchases made using catalog (buying goods to be shipped through the mail)
+NumStorePurchases,int64,Number of purchases made directly in stores
+NumWebPurchases,int64,Number of purchases made through the company's website
+NumWebVisitsMonth,int64,Number of visits to company's website in the last month
+Recency,int64,Number of days since the last purchase
