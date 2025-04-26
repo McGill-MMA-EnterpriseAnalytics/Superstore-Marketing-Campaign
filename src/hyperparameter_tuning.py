@@ -2,18 +2,13 @@ import logging
 import os
 from functools import partial
 
-import joblib
-import numpy as np
-import optuna
-import pandas as pd
-from sklearn.metrics import f1_score
 import mlflow
+import optuna
+from sklearn.metrics import f1_score
 
-from src.utils.config import get_data_paths, get_model_config, get_paths
-from src.utils.mlflow_utils import setup_mlflow, log_model_metrics
-from src.train_model import load_data, get_model, evaluate_model_on_test, save_model
-
-
+from src.train_model import evaluate_model_on_test, get_model, load_data, save_model
+from src.utils.config import get_model_config, get_paths
+from src.utils.mlflow_utils import setup_mlflow
 
 # Set up logging
 logging.basicConfig(

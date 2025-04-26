@@ -4,8 +4,8 @@ import platform
 from pathlib import Path
 
 import mlflow
-from mlflow.tracking import MlflowClient
 from mlflow.exceptions import MlflowException
+from mlflow.tracking import MlflowClient
 
 #from utils.config import get_paths
 from .config import get_paths

@@ -26,7 +26,7 @@ def load_config(config_path=None):
         raise FileNotFoundError(f"Configuration file not found at {config_file}")
 
     # Load the YAML file
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         config = yaml.safe_load(f)
 
     return config
