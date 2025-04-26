@@ -92,3 +92,29 @@ def test_lgbm_wrapper_fit_and_predict():
     # Predict_proba
     probas = wrapper.predict_proba(df)
     assert probas.shape == (2, 2)
+
+def test_load_data(tmp_path, monkeypatch):
+    # Create three small DataFrames and write as parquet
+    df = pd.DataFrame({'a': [1, 2, 3], 'target': [0, 1, 0]})
+    train = tmp_path / 'train.parquet'
+    val = tmp_path / 'validation.parquet'
+    test = tmp_path / 'test.parquet'
+    df.to_parquet(train)
+    df.to_parquet(val)
+    df.to_parquet(test)
+
+    # Mock get_data_paths()
+    monkeypatch.setattr(mp, 'get_data_paths', lambda: {
+        'processed': {
+            'train': str(train),
+            'validation': str(val),
+            'test': str(test)
+        }
+    })
+
+    X_train, y_train, X_val, y_val, X_test, y_test = mp.load_data()
+
+    # Verify shapes and types
+    assert isinstance(X_train, pd.DataFrame)
+    assert isinstance(y_train, pd.Series)
+    assert y_train.tolist() == [0, 1, 0]
