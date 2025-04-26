@@ -65,3 +65,30 @@ def test_xgboost_wrapper_fit_and_predict():
     probas = wrapper.predict_proba(df)
     assert probas.shape == (2, 2)
     assert np.all(probas[:, 1] == 1)
+
+def test_lgbm_wrapper_fit_and_predict():
+    # Create DataFrame with an object column
+    df = pd.DataFrame({
+        'cat': ['x', 'y'],
+        'val': [10, 20]
+    })
+    y = np.array([1, 0])
+    dummy = DummyModel()
+    wrapper = mp.LGBMWrapper(dummy)
+
+    # Fit
+    wrapper.fit(df, y)
+    # classes_ should be unique labels
+    assert np.array_equal(wrapper.classes_, np.array([0, 1]))
+    # Underlying dummy.fit called with encoded object column
+    fit_df = dummy.fit_called_with
+    assert sorted(fit_df['cat'].unique().tolist()) == [0, 1]
+
+    # Predict
+    preds = wrapper.predict(df)
+    assert isinstance(preds, np.ndarray)
+    assert preds.tolist() == [0, 0]
+
+    # Predict_proba
+    probas = wrapper.predict_proba(df)
+    assert probas.shape == (2, 2)
