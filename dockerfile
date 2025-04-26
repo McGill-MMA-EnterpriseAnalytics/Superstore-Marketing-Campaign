@@ -1,27 +1,42 @@
-# 1. Base image with Python & Poetry
+#########################################
+# 1) Builder stage: install dependencies
+#########################################
 FROM python:3.10-slim AS builder
 
-# 2. Install system deps & poetry
+# system deps
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl build-essential \
-  && curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 - \
-  && ln -s /opt/poetry/bin/poetry /usr/local/bin/poetry \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+ && apt-get install -y --no-install-recommends \
+      build-essential \
+      curl \
+ && rm -rf /var/lib/apt/lists/*
 
-# 3. Set working dir, copy project metadata
 WORKDIR /app
+
+# copy only poetry config to speed up rebuilds
 COPY pyproject.toml poetry.lock* /app/
 
-# 4. Install Python deps (no dev)
-RUN poetry config virtualenvs.create false \
-  && poetry install --no-dev --no-interaction --no-ansi
+# install Poetry (latest), disable venvs, install only main deps
+RUN pip install poetry \
+ && poetry config virtualenvs.create false \
+ && poetry install --no-interaction --no-ansi --without dev --no-root
 
-# 5. Copy your source
-COPY . /app
+#########################################
+# 2) Runtime stage: copy just what’s needed
+#########################################
+FROM python:3.10-slim AS runtime
 
-# 6. (Optional) expose ports if you add a web server later
-# EXPOSE 8000
+WORKDIR /app
 
-# 7. Default command 
-CMD ["poetry", "run", "python", "-m", "src.train_model"]
+# copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
+COPY --from=builder /usr/local/bin/poetry /usr/local/bin/poetry
+
+# copy your code
+COPY src/ /app/src/
+COPY src/utils/ /app/utils/
+
+# set PYTHONPATH so you can import your package
+ENV PYTHONPATH=/app
+
+# default command
+CMD ["python", "-m", "src.train_model"]
