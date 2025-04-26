@@ -67,9 +67,13 @@ def get_model_config(model_name, tuned=False, config=None):
 
     try:
         return config["models"][model_name][model_type]
-    except KeyError:
+    except KeyError as err:
         available_models = list(config.get("models", {}).keys())
-        raise ValueError(f"Model '{model_name}' not found. Available models: {available_models}")
+        raise ValueError(
+            f"Model '{model_name}' not found. Available models: {available_models}"
+        ) from err
+
+
 
 
 def get_preprocessing_config(config=None):
