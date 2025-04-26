@@ -12,7 +12,7 @@ from catboost import CatBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 # Replace 'model_pipeline' with the actual filename (without .py) of your module
-import model_pipeline as mp
+import src.train_model as mp
 
 class DummyModel:
     """A dummy classifier to capture fit/predict calls."""
