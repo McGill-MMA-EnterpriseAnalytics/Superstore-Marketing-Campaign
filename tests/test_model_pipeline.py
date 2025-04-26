@@ -179,3 +179,14 @@ def test_plot_feature_importance_and_confusion(tmp_path, monkeypatch):
     dt = DecisionTreeClassifier().fit(X, y)
     path2 = mp.plot_confusion_matrix(dt, X, y, 'dtmod')
     assert os.path.exists(path2)
+
+
+def test_evaluate_model_on_test():
+    # Use a simple DecisionTreeClassifier
+    X = pd.DataFrame({'x': [0, 1, 1, 0]})
+    y = np.array([0, 1, 1, 0])
+    dt = DecisionTreeClassifier().fit(X, y)
+    metrics = mp.evaluate_model_on_test(dt, X, y, 'dtmod')
+    # Check that all expected keys are present
+    for key in ['test_accuracy', 'test_precision', 'test_recall', 'test_f1', 'test_roc_auc']:
+        assert key in metrics
