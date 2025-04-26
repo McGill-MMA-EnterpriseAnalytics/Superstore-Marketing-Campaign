@@ -30,6 +30,9 @@ ruff = "^0.11.6"
 nbqa = "^1.9.1"
 pytest = "^8.3.5"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.7"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
@@ -39,3 +42,21 @@ minversion = "6.0"
 addopts = "--strict-markers"
 testpaths = ["tests"]
 
+[tool.ruff]
+# Only these top-level keys remain here:
+line-length = 120
+exclude = [
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  ".venv",
+]
+
+# All rule selection/ignores now go under “lint”
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "S", "U"]
+ignore = ["E203"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "F401", "I001"]
