@@ -126,5 +126,5 @@ def create_directories():
     """
     paths = get_paths()
 
-    for path_name, path_value in paths.items():
+    for _path_name, path_value in paths.items():
         os.makedirs(path_value, exist_ok=True)
