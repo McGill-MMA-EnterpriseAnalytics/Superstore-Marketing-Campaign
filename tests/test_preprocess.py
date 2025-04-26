@@ -96,3 +96,35 @@ def test_implement_clustering(monkeypatch):
     result = preprocess.implement_clustering(df.copy())
     assert 'customer_segment' in result.columns
     assert set(result['customer_segment']) == {0, 1}
+
+def test_create_engineered_features():
+    current_year = dt.datetime.now().year
+    today = dt.datetime.now().date()
+    df = pd.DataFrame([{
+        'mntwines': 1,
+        'mntfruits': 1,
+        'mntmeatproducts': 1,
+        'mntfishproducts': 1,
+        'mntsweetproducts': 1,
+        'mntgoldprods': 1,
+        'year_birth': current_year - 30,
+        'kidhome': 1,
+        'teenhome': 0,
+        'marital_status': 'Married',
+        'income': 100,
+        'recency': 10,
+        'numwebpurchases': 2,
+        'numcatalogpurchases': 0,
+        'numstorepurchases': 1,
+        'numwebvisitsmonth': 5,
+        'dt_customer': today.isoformat()
+    }])
+    result = preprocess.create_engineered_features(df.copy())
+    assert result['total_spend'].iloc[0] == 6
+    assert result['age'].iloc[0] == 30
+    assert result['has_children'].iloc[0] == 1
+    # after one-hot, check the dummy column for 'web'
+    assert result['preferred_channel_web'].iloc[0] == 1
+    assert result['channel_diversity'].iloc[0] == 2
+    assert np.isclose(result['recency_score'].iloc[0], np.exp(-10/30))
+    assert result['is_active'].iloc[0] == 1
