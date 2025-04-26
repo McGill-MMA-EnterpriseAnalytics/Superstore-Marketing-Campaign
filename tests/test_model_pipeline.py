@@ -144,3 +144,17 @@ def test_get_model_variants(monkeypatch):
     # unsupported model raises ValueError
     with pytest.raises(ValueError):
         mp.get_model('unknown_model')
+
+def test_save_and_load_model(tmp_path, monkeypatch):
+    # Monkeypatch get_paths() to return tmp 'models' directory
+    monkeypatch.setattr(mp, 'get_paths', lambda: {'models': str(tmp_path)})
+
+    dummy = DummyModel()
+    filepath = mp.save_model(dummy, 'testmodel', tuned=False)
+
+    # File should exist
+    assert os.path.exists(filepath)
+
+    # Loading should return the same DummyModel
+    loaded = joblib.load(filepath)
+    assert isinstance(loaded, DummyModel)
