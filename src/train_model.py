@@ -1,6 +1,8 @@
+# Standard library
 import logging
 import os
 
+# Third-party libraries
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,8 +10,6 @@ import pandas as pd
 import seaborn as sns
 from catboost import CatBoostClassifier
 from lightgbm import LGBMClassifier
-
-# Import sklearn base classes for wrapper classes
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -21,23 +21,16 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-
-# Import model libraries
 from xgboost import XGBClassifier
 
-# Import configuration utilities
-# from utils.config import (
-#     create_directories,
-#     get_data_paths,
-#     get_model_config,
-#     get_paths,
-#     load_config,
-# )
-# Change to run directly with poetry
-from src.utils.config import create_directories, get_data_paths, get_model_config, get_paths, load_config
-
-# Import MLflow utilities
-#from utils.mlflow_utils import setup_mlflow, log_model_metrics, log_best_model
+# Local application imports
+from src.utils.config import (
+    create_directories,
+    get_data_paths,
+    get_model_config,
+    get_paths,
+    load_config,
+)
 from src.utils.mlflow_utils import log_best_model, log_model_metrics, setup_mlflow
 
 # Set up logging
@@ -747,7 +740,7 @@ def main():
         logger.info(f"Training baseline {model_name} model")
 
         # Create MLflow run for this model
-        run_id = None
+        # run_id = None
 
         # Handle CatBoost specially
         cat_features = None
