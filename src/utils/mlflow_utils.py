@@ -4,8 +4,8 @@ import platform
 from pathlib import Path
 
 import mlflow
-from mlflow.tracking import MlflowClient
 from mlflow.exceptions import MlflowException
+from mlflow.tracking import MlflowClient
 
 #from utils.config import get_paths
 from .config import get_paths
@@ -246,7 +246,7 @@ def get_model_from_registry(model_name, stage="Production"):
                 return mlflow.sklearn.load_model(model_uri)
             except Exception as e:
                 logger.error(f"Error loading model with sklearn: {e}")
-                raise ValueError(f"Could not load model {model_name} from registry")
+                raise ValueError(f"Could not load model {model_name} from registry") from e
     except Exception as e:
         logger.error(f"Error getting model from registry: {e}")
         return None

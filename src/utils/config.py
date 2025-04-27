@@ -26,7 +26,7 @@ def load_config(config_path=None):
         raise FileNotFoundError(f"Configuration file not found at {config_file}")
 
     # Load the YAML file
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         config = yaml.safe_load(f)
 
     return config
@@ -67,9 +67,13 @@ def get_model_config(model_name, tuned=False, config=None):
 
     try:
         return config["models"][model_name][model_type]
-    except KeyError:
+    except KeyError as err:
         available_models = list(config.get("models", {}).keys())
-        raise ValueError(f"Model '{model_name}' not found. Available models: {available_models}")
+        raise ValueError(
+            f"Model '{model_name}' not found. Available models: {available_models}"
+        ) from err
+
+
 
 
 def get_preprocessing_config(config=None):
@@ -126,5 +130,5 @@ def create_directories():
     """
     paths = get_paths()
 
-    for path_name, path_value in paths.items():
+    for _path_name, path_value in paths.items():
         os.makedirs(path_value, exist_ok=True)

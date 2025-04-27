@@ -2,18 +2,13 @@ import logging
 import os
 from functools import partial
 
-import joblib
-import numpy as np
-import optuna
-import pandas as pd
-from sklearn.metrics import f1_score
 import mlflow
+import optuna
+from sklearn.metrics import f1_score
 
-from src.utils.config import get_data_paths, get_model_config, get_paths
-from src.utils.mlflow_utils import setup_mlflow, log_model_metrics
-from src.train_model import load_data, get_model, evaluate_model_on_test, save_model
-
-
+from src.train_model import evaluate_model_on_test, get_model, load_data, save_model
+from src.utils.config import get_model_config, get_paths
+from src.utils.mlflow_utils import setup_mlflow
 
 # Set up logging
 logging.basicConfig(
@@ -296,10 +291,10 @@ def optimize_hyperparameters(model_name, n_trials=20):
         )
         
         # Save tuned model
-        tuned_model_path = save_model(tuned_model, f"{model_name}_automl", tuned=True)
+        save_model(tuned_model, f"{model_name}_automl", tuned=True)
         
         # Evaluate on test set
-        tuned_test_metrics = evaluate_model_on_test(
+        evaluate_model_on_test(
             tuned_model, X_test, y_test, f"{model_name}_automl_tuned"
         )
         

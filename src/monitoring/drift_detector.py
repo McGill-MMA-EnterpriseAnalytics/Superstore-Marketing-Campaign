@@ -1,10 +1,12 @@
-import logging
 import glob
+import logging
+
 import joblib
 import numpy as np
 import pandas as pd
 from scipy.stats import wasserstein_distance
 from sklearn.metrics import f1_score
+
 from src.utils.config import load_config
 
 logger = logging.getLogger(__name__)
