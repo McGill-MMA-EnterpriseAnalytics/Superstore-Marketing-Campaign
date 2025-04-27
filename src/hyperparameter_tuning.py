@@ -291,10 +291,10 @@ def optimize_hyperparameters(model_name, n_trials=20):
         )
         
         # Save tuned model
-        tuned_model_path = save_model(tuned_model, f"{model_name}_automl", tuned=True)
+        save_model(tuned_model, f"{model_name}_automl", tuned=True)
         
         # Evaluate on test set
-        tuned_test_metrics = evaluate_model_on_test(
+        evaluate_model_on_test(
             tuned_model, X_test, y_test, f"{model_name}_automl_tuned"
         )
         

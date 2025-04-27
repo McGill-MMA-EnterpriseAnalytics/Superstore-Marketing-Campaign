@@ -617,7 +617,12 @@ def evaluate_model_on_test(model, X_test, y_test, model_name, run_id=None):
             # Identify potential categorical features (object or category dtype)
             cat_features_indices = []
             for i, col in enumerate(X_test.columns):
-                if X_test[col].dtype == 'object' or X_test[col].dtype.name == 'category' or 'education_' in col or 'marital_status_' in col:
+                if (
+                    X_test[col].dtype == 'object'
+                    or X_test[col].dtype.name == 'category'
+                    or 'education_' in col
+                    or 'marital_status_' in col
+                ):
                     cat_features_indices.append(i)
 
             # Use copy to avoid modifying original data
