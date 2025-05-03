@@ -33,6 +33,10 @@ from src.utils.config import (
 )
 from src.utils.mlflow_utils import log_best_model, log_model_metrics, setup_mlflow
 
+import joblib
+import os
+
+
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -885,8 +889,15 @@ def main():
         )
         
         logger.info(f"Best model registered with URI: {model_uri}")
+        paths = get_paths()
+        models_dir = paths.get("models", "models/")
+        best_model_path = os.path.join(models_dir, "best_model_tuned.pkl")
+        joblib.dump(best_models["model"], best_model_path)
+        logger.info(f"Best model saved at {best_model_path}")
+
 
     logger.info("All models trained and evaluated successfully")
+
 
 if __name__ == "__main__":
     main()

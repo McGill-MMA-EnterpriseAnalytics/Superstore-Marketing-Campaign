@@ -1,5 +1,6 @@
 #########################################
-# 1) Builder stage: install dependencies
+# Dockerfile for Training
+# This Dockerfile is for training models only
 #########################################
 FROM python:3.10-slim AS builder
 
@@ -22,7 +23,7 @@ RUN pip install poetry \
  && poetry install --no-interaction --no-ansi --without dev --no-root
 
 #########################################
-# 2) Runtime stage: copy just what’s needed
+# Runtime stage: copy just what's needed
 #########################################
 FROM python:3.10-slim AS runtime
 
@@ -40,9 +41,13 @@ COPY --from=builder /usr/local/bin/poetry /usr/local/bin/poetry
 # copy your code
 COPY src/ /app/src/
 COPY src/utils/ /app/utils/
+COPY config.yaml /app/config.yaml
+
+# create models directory
+RUN mkdir -p /app/models/
 
 # set PYTHONPATH so you can import your package
 ENV PYTHONPATH=/app
 
-# default command
+# default command - run training script
 CMD ["python", "-m", "src.train_model"]

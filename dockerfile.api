@@ -1,0 +1,31 @@
+#########################################
+# Dockerfile for FastAPI Service
+# This Dockerfile is for serving the model via API only
+#########################################
+FROM python:3.10-slim AS builder
+
+# system deps - minimal for API serving
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      libgomp1 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install only the dependencies needed for serving
+RUN pip install fastapi uvicorn pandas numpy scikit-learn joblib catboost
+
+# Copy model and code
+COPY models/best_model_tuned.pkl /app/models/
+COPY src/app.py /app/src/
+COPY src/utils/ /app/src/utils/
+COPY config.yaml /app/config.yaml
+
+# set PYTHONPATH so you can import your package
+ENV PYTHONPATH=/app
+
+# Expose port for FastAPI
+EXPOSE 8000
+
+# default command - run FastAPI app with Uvicorn
+CMD ["python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"] 
