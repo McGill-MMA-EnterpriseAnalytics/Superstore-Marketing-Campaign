@@ -1,7 +1,7 @@
 # model binaries
-/models/
+
 /mlruns/
-*.pkl
+
 
 # evaluation artifacts
 /figures/
