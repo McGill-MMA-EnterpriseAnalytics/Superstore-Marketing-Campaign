@@ -21,8 +21,6 @@ The dataset consists of 2,240 customer records with information on:
 
 ## Architecture
 
-![Architecture Diagram](https://i.imgur.com/TyUiVeD.png)
-
 The project follows a modular architecture with several key components:
 
 ### 1. Data Engineering & Preprocessing
