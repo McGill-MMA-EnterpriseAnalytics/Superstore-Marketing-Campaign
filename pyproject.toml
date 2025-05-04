@@ -5,8 +5,7 @@ description = "ML pipeline for Superstore marketing campaign"
 authors = ["Arturo Medina <arturo-mn@outlook.com>"]
 license = "MIT"
 packages = [
-    {include = "src"},
-    {include = "utils"}
+    { include = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -24,11 +23,7 @@ lightgbm = "^4.6.0"
 joblib = "^1.4.2"
 PyYAML = "^6.0.2"
 scipy = "^1.15.2"
-
-[tool.poetry.dev-dependencies]
-ruff = "^0.11.6"
-nbqa = "^1.9.1"
-pytest = "^8.3.5"
+causalml = ">=0.15.2"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.11.7"
@@ -38,13 +33,7 @@ isort = "^6.0.1"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "--strict-markers"
-testpaths = ["tests"]
-
 [tool.ruff]
-# Only these top-level keys remain here:
 line-length = 130
 exclude = [
   ".git",
@@ -53,8 +42,6 @@ exclude = [
   "dist",
   ".venv",
 ]
-
-# All rule selection/ignores now go under “lint”
 [tool.ruff.lint]
 select = ["E", "F", "B", "I", "S", "U"]
 ignore = ["E203"]
