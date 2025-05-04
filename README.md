@@ -325,12 +325,3 @@ The project is designed for future deployment to AWS with the following componen
 5. **Monitoring Changes**:
    - Enhance drift detection in `src/monitoring/drift_detector.py`
    - Add new monitoring metrics as needed
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- The Superstore dataset
-- Contributors to the open-source libraries used in this project
