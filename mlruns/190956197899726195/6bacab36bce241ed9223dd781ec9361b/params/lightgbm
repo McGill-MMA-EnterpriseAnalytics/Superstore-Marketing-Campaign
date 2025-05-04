@@ -1,4 +1,0 @@
-LGBMWrapper(lgbm_model=LGBMClassifier(colsample_bytree=0.8, learning_rate=0.05,
-                                      max_depth=8, n_estimators=150,
-                                      num_leaves=40, random_state=42,
-                                      subsample=0.8, verbosity=-1))

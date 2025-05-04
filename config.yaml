@@ -4,9 +4,9 @@ data:
   raw: 'superstore_data.csv'
   dictionary: 'datadictionary.xlsx'
   processed:
-    train: 'train.parquet'
-    validation: 'val.parquet'
-    test: 'test.parquet'
+    train: 'artifacts/data/processed/train.parquet'
+    validation: 'artifacts/data/processed/val.parquet'
+    test: 'artifacts/data/processed/test.parquet'
 
 # Preprocessing configurations
 preprocessing:

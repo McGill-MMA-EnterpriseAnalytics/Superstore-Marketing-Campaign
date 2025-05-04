@@ -1,0 +1,15 @@
+# model binaries
+/models/
+/mlruns/
+*.pkl
+
+# evaluation artifacts
+/figures/
+/results/
+*.png
+*.parquet
+
+# logs, caches
+/logs/
+__pycache__/
+.DS_Store

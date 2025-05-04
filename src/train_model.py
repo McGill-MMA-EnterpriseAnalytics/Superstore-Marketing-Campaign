@@ -1,6 +1,8 @@
+# Standard library
 import logging
 import os
 
+# Third-party libraries
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,8 +10,6 @@ import pandas as pd
 import seaborn as sns
 from catboost import CatBoostClassifier
 from lightgbm import LGBMClassifier
-
-# Import sklearn base classes for wrapper classes
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -21,32 +21,21 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-
-# Import model libraries
 from xgboost import XGBClassifier
 
-# Import configuration utilities
-# from utils.config import (
-#     create_directories,
-#     get_data_paths,
-#     get_model_config,
-#     get_paths,
-#     load_config,
-# )
-# Change to run directly with poetry
+# Local application imports
 from src.utils.config import (
-    load_config,
+    create_directories,
     get_data_paths,
     get_model_config,
-    get_training_config,
     get_paths,
-    create_directories
+    load_config,
 )
+from src.utils.mlflow_utils import log_best_model, log_model_metrics, setup_mlflow
 
+import joblib
+import os
 
-# Import MLflow utilities
-#from utils.mlflow_utils import setup_mlflow, log_model_metrics, log_best_model
-from src.utils.mlflow_utils import setup_mlflow, log_model_metrics, log_best_model
 
 # Set up logging
 logging.basicConfig(
@@ -632,7 +621,12 @@ def evaluate_model_on_test(model, X_test, y_test, model_name, run_id=None):
             # Identify potential categorical features (object or category dtype)
             cat_features_indices = []
             for i, col in enumerate(X_test.columns):
-                if X_test[col].dtype == 'object' or X_test[col].dtype.name == 'category' or 'education_' in col or 'marital_status_' in col:
+                if (
+                    X_test[col].dtype == 'object'
+                    or X_test[col].dtype.name == 'category'
+                    or 'education_' in col
+                    or 'marital_status_' in col
+                ):
                     cat_features_indices.append(i)
 
             # Use copy to avoid modifying original data
@@ -755,7 +749,7 @@ def main():
         logger.info(f"Training baseline {model_name} model")
 
         # Create MLflow run for this model
-        run_id = None
+        # run_id = None
 
         # Handle CatBoost specially
         cat_features = None
@@ -895,8 +889,15 @@ def main():
         )
         
         logger.info(f"Best model registered with URI: {model_uri}")
+        paths = get_paths()
+        models_dir = paths.get("models", "models/")
+        best_model_path = os.path.join(models_dir, "best_model_tuned.pkl")
+        joblib.dump(best_models["model"], best_model_path)
+        logger.info(f"Best model saved at {best_model_path}")
+
 
     logger.info("All models trained and evaluated successfully")
+
 
 if __name__ == "__main__":
     main()

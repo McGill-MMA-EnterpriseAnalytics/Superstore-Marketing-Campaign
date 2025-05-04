@@ -1,0 +1,42 @@
+# Monitoring Configuration
+
+# Data paths
+monitoring:
+  reference_data_path: 'val.parquet'
+  production_data_glob: '*.parquet'
+  model_path: 'models/xgboost_automl_tuned.pkl'
+  thresholds:
+    feature_drift: 0.1
+    target_drift: 0.05
+    prediction_drift: 0.05
+    performance_drop: 0.05
+
+# Email alert configuration
+email:
+  from: "model-alerts@example.com"
+  smtp_server: "smtp.example.com" 
+  smtp_port: 587
+  smtp_user: "your-username"
+  smtp_password: "your-password"
+  recipients:
+    - "data-scientist@example.com"
+    - "product-manager@example.com"
+
+# Schedule configuration (for documentation, actual scheduling via cron/systemd)
+schedule:
+  frequency: "daily"  # Options: hourly, daily, weekly
+  time: "01:00"       # Time of day (for daily/weekly runs)
+  day: "Monday"       # Day of week (for weekly runs)
+
+# MLflow configuration
+mlflow:
+  tracking_uri: "mlruns/"  # Local path, will be updated to AWS URI in future
+  experiment_name: "marketing-campaign-monitoring"
+  artifact_path: "artifacts/"
+
+# Paths for saving artifacts
+paths:
+  results: "results/"
+  figures: "figures/"
+  logs: "logs/"
+  mlruns: "mlruns/" 

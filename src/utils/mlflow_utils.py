@@ -4,6 +4,7 @@ import platform
 from pathlib import Path
 
 import mlflow
+from mlflow.exceptions import MlflowException
 from mlflow.tracking import MlflowClient
 
 #from utils.config import get_paths
@@ -114,7 +115,6 @@ def log_model_metrics(run_id=None, model_name=None, metrics=None, params=None, t
         return current_run_id
 
 
-
 def log_best_model(model, model_name, metrics, feature_names=None, feature_importance=None):
     """
     Log the best model to MLflow model registry.
@@ -129,6 +129,13 @@ def log_best_model(model, model_name, metrics, feature_names=None, feature_impor
     Returns:
         str: Model URI
     """
+    # Ensure the registered model exists; create once if missing
+    client = MlflowClient()
+    try:
+        client.get_registered_model(model_name)
+    except MlflowException:
+        client.create_registered_model(model_name)
+
     with mlflow.start_run(run_name=f"{model_name}_best"):
         # Log model name as a tag
         mlflow.set_tag("model_name", model_name)
@@ -147,7 +154,6 @@ def log_best_model(model, model_name, metrics, feature_names=None, feature_impor
         
         # Determine the flavor to use based on model type
         if "XGBoost" in model.__class__.__name__:
-            # For XGBoost wrapper, get the underlying model
             if hasattr(model, "xgb_model"):
                 model_info = mlflow.xgboost.log_model(
                     model.xgb_model,
@@ -161,7 +167,6 @@ def log_best_model(model, model_name, metrics, feature_names=None, feature_impor
                     registered_model_name=model_name
                 )
         elif "LGBM" in model.__class__.__name__:
-            # For LightGBM wrapper, get the underlying model
             if hasattr(model, "lgbm_model"):
                 model_info = mlflow.lightgbm.log_model(
                     model.lgbm_model,
@@ -175,14 +180,12 @@ def log_best_model(model, model_name, metrics, feature_names=None, feature_impor
                     registered_model_name=model_name
                 )
         elif "CatBoost" in model.__class__.__name__:
-            # Use sklearn flavor for CatBoost
             model_info = mlflow.sklearn.log_model(
                 model,
                 "model",
                 registered_model_name=model_name
             )
         else:
-            # Default to sklearn flavor
             model_info = mlflow.sklearn.log_model(
                 model,
                 "model",
@@ -197,14 +200,6 @@ def log_best_model(model, model_name, metrics, feature_names=None, feature_impor
 def get_best_run(experiment_name, metric="f1", ascending=False):
     """
     Get the best run for a given metric.
-    
-    Parameters:
-        experiment_name (str): Name of the experiment
-        metric (str): Metric name to sort by
-        ascending (bool): Sort ascending or descending
-    
-    Returns:
-        pd.DataFrame: Dataframe with best run
     """
     experiment = mlflow.get_experiment_by_name(experiment_name)
     
@@ -212,19 +207,16 @@ def get_best_run(experiment_name, metric="f1", ascending=False):
         logger.error(f"Experiment {experiment_name} not found")
         return None
     
-    # Get all runs
     runs = mlflow.search_runs(experiment_ids=[experiment.experiment_id])
     
     if runs.empty:
         logger.warning(f"No runs found for experiment {experiment_name}")
         return None
     
-    # Sort by metric
     metric_col = f"metrics.{metric}"
     if metric_col in runs.columns:
         runs = runs.sort_values(metric_col, ascending=ascending)
-        best_run = runs.iloc[0]
-        return best_run
+        return runs.iloc[0]
     else:
         logger.warning(f"Metric {metric} not found in runs")
         return None
@@ -233,30 +225,19 @@ def get_best_run(experiment_name, metric="f1", ascending=False):
 def get_model_from_registry(model_name, stage="Production"):
     """
     Get a model from the MLflow registry.
-    
-    Parameters:
-        model_name (str): Name of the model
-        stage (str): Model stage (None, Staging, Production, Archived)
-    
-    Returns:
-        model: Loaded model
     """
     client = MlflowClient()
     
     try:
-        # Get latest version of the model in the specified stage
         latest_versions = client.get_latest_versions(model_name, stages=[stage])
         if not latest_versions:
             logger.error(f"No {model_name} model found in {stage} stage")
             return None
-            
+        
         model_version = latest_versions[0]
         logger.info(f"Loading {model_name} version {model_version.version} from {stage} stage")
         
-        # Load the model
         model_uri = f"models:/{model_name}/{model_version.version}"
-        
-        # Try to determine the correct flavor to use
         try:
             return mlflow.pyfunc.load_model(model_uri)
         except Exception as e:
@@ -265,8 +246,7 @@ def get_model_from_registry(model_name, stage="Production"):
                 return mlflow.sklearn.load_model(model_uri)
             except Exception as e:
                 logger.error(f"Error loading model with sklearn: {e}")
-                raise ValueError(f"Could not load model {model_name} from registry")
-                
+                raise ValueError(f"Could not load model {model_name} from registry") from e
     except Exception as e:
         logger.error(f"Error getting model from registry: {e}")
         return None
@@ -275,14 +255,6 @@ def get_model_from_registry(model_name, stage="Production"):
 def compare_runs(experiment_name, metric_name="f1", n_runs=5):
     """
     Compare top runs in an experiment based on a metric.
-    
-    Parameters:
-        experiment_name (str): Name of the experiment
-        metric_name (str): Name of the metric to compare
-        n_runs (int): Number of top runs to return
-    
-    Returns:
-        pd.DataFrame: Dataframe with top runs
     """
     experiment = mlflow.get_experiment_by_name(experiment_name)
     
@@ -290,14 +262,12 @@ def compare_runs(experiment_name, metric_name="f1", n_runs=5):
         logger.error(f"Experiment {experiment_name} not found")
         return None
     
-    # Get all runs
     runs = mlflow.search_runs(experiment_ids=[experiment.experiment_id])
     
     if runs.empty:
         logger.warning(f"No runs found for experiment {experiment_name}")
         return None
     
-    # Sort by metric
     metric_col = f"metrics.{metric_name}"
     if metric_col in runs.columns:
         runs = runs.sort_values(metric_col, ascending=False)
